@@ -18,7 +18,7 @@ inputs:
     type: boolean
     default: true
     inputBinding:
-      prefix: REMOVE_DUPLICATES=
+      prefix: REMOVE_DUPLICATES=true
       separate: false
 
 outputs:

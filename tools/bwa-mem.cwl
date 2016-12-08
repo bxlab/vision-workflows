@@ -37,3 +37,4 @@ inputs:
 outputs:
   output:
     type: stdout
+    format: bam

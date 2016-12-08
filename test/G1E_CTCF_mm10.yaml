@@ -5,3 +5,6 @@ reads:
 idxbase:
   class: File
   path: /cache/genomes/bwa/mm10/mm10.fa
+blacklist:
+  class: File
+  path: /home/jtayl139/mm10.blacklist.bed
