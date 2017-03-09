@@ -1,7 +1,12 @@
-reads: 
-  - in1: 
-      class: File
-      path: /home/jtayl139/CTCF_G1E.fastq
+replicates:
+  - treatment: 
+      in1: 
+        class: File
+        path: /home/jtayl139/CTCF_G1E.fastq
+    control: 
+      in1: 
+        class: File
+        path: /home/jtayl139/CTCF_G1E.fastq
 idxbase:
   class: File
   path: /cache/genomes/bwa/mm10/mm10.fa

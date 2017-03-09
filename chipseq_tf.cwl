@@ -5,19 +5,31 @@ class: Workflow
 
 requirements:
   - class: ScatterFeatureRequirement
-  - class: StepInputExpressionRequirement
-  - class: InlineJavascriptRequirement
+  - class: SubworkflowFeatureRequirement
 
 inputs:
-  reads:
-    doc: Reads to map, either single or paired
+  replicates:
     type:
       type: array
       items:
-          type: record
-          fields:
-            in1: File
-            in2: File?
+        type: record
+        fields:
+          treatment:
+            doc: Reads for treatment
+            type:
+              &array-of-pairs
+              # FIXME: Why is name needed here but not above?? 
+              #        See http://www.commonwl.org/v1.0/SchemaSalad.html#SaladRecordSchema
+              #        and https://github.com/common-workflow-language/schema_salad/blob/master/schema_salad/schema.py#L411
+              name: array-of-pairs
+              type: record
+              fields:
+                in1: File
+                in2: File?
+          control:
+            doc: Reads for control
+            type:
+              <<: *array-of-pairs
   idxbase:
     doc: Base filename of bwa index to map against
     type: File
@@ -26,51 +38,32 @@ inputs:
     type: File
 
 outputs:
-  processed_reads:
+  narrowpeak_file:
     type: File[]
-    outputSource: remove_blacklist/output
+    outputSource: call_peaks/narrowpeak_file
 
 steps:
-  align:
-    run: ./tools/bwa-mem.cwl
+  align_treatment:
+    run: chipseq_tf_align.cwl
     in:
-      reads: reads
+      reads: replicates/treatment
       idxbase: idxbase
-    out: [output]
+      blacklist: blacklist
+    out: [processed_reads]
     scatter: [ reads ]
+  align_control:
+    run: chipseq_tf_align.cwl
+    in:
+      reads: replicates/control
+      idxbase: idxbase
+      blacklist: blacklist
+    out: [processed_reads]
+    scatter: [ reads ]
+  call_peaks:
+    run: tools/macs-callpeak.cwl
+    in:
+      treatment: align_treatment/processed_reads
+      control: align_control/processed_reads
+    out: [narrowpeak_file]
+    scatter: [ treatment, control ]
     scatterMethod: dotproduct
-  to_bam:
-    run: ./tools/samtools-samtobam.cwl
-    in:
-      input: align/output
-    out: [output]
-    scatter: [ input ]
-  sort:
-    run: ./tools/samtools-sort.cwl
-    in:
-      input: to_bam/output
-    out: [output]
-    scatter: [ input ]
-  mark_duplicates:
-    run: ./tools/picard-MarkDuplicates.cwl
-    in:
-      input: sort/output
-    out: [output]
-    scatter: [ input ]
-  remove_unmapped:
-    run: ./tools/samtools-view.cwl
-    in:
-      input: mark_duplicates/output
-      filter_none_set:
-        valueFrom: "4"
-    out: [output]
-    scatter: [ input ]
-  remove_blacklist:
-    run: ./tools/bedtools-intersect.cwl
-    in:
-      a: remove_unmapped/output
-      b: blacklist
-      v:
-        valueFrom: ${ return true; }
-    out: [output]
-    scatter: [ a ]
