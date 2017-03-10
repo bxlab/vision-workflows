@@ -5,11 +5,11 @@ class: CommandLineTool
 
 hints:
   - class: DockerRequirement
-    dockerPull: quay.io/biocontainers/macs:2.1.1.20160309--r3.2.2_0
+    dockerPull: quay.io/biocontainers/macs2:2.1.1.20160309--r3.2.2_0
   - class: ResourceRequirement
     coresMax: 112
 
-baseCommand: [ macs, callpeak, --outdir, outdir ]
+baseCommand: [ macs2, callpeak, --outdir, outdir ]
 
 inputs:
   treatment:

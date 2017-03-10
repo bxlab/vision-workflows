@@ -6,6 +6,7 @@ class: Workflow
 requirements:
   - class: ScatterFeatureRequirement
   - class: SubworkflowFeatureRequirement
+  - class: StepInputExpressionRequirement
 
 inputs:
   replicates:
@@ -46,7 +47,9 @@ steps:
   align_treatment:
     run: chipseq_tf_align.cwl
     in:
-      reads: replicates/treatment
+      reads: 
+        source: replicates
+        valueFrom: $(self.treatment)
       idxbase: idxbase
       blacklist: blacklist
     out: [processed_reads]
@@ -54,7 +57,9 @@ steps:
   align_control:
     run: chipseq_tf_align.cwl
     in:
-      reads: replicates/control
+      reads: 
+        source: replicates
+        valueFrom: $(self.control)
       idxbase: idxbase
       blacklist: blacklist
     out: [processed_reads]

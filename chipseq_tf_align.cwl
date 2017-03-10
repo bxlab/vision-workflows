@@ -25,7 +25,7 @@ inputs:
 
 outputs:
   processed_reads:
-    type: File[]
+    type: File
     outputSource: remove_blacklist/output
 
 steps:
