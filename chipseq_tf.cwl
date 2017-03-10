@@ -7,9 +7,11 @@ requirements:
   - class: ScatterFeatureRequirement
   - class: SubworkflowFeatureRequirement
   - class: StepInputExpressionRequirement
+  - $import: types.cwl
 
 inputs:
   replicates:
+    doc: List of replicates
     type:
       type: array
       items:
@@ -17,20 +19,10 @@ inputs:
         fields:
           treatment:
             doc: Reads for treatment
-            type:
-              &array-of-pairs
-              # FIXME: Why is name needed here but not above?? 
-              #        See http://www.commonwl.org/v1.0/SchemaSalad.html#SaladRecordSchema
-              #        and https://github.com/common-workflow-language/schema_salad/blob/master/schema_salad/schema.py#L411
-              name: array-of-pairs
-              type: record
-              fields:
-                in1: File
-                in2: File?
+            type: "types.cwl#ReadPair"
           control:
             doc: Reads for control
-            type:
-              <<: *array-of-pairs
+            type: "types.cwl#ReadPair"
   idxbase:
     doc: Base filename of bwa index to map against
     type: File
