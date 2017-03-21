@@ -7,6 +7,7 @@ requirements:
   - class: ScatterFeatureRequirement
   - class: SubworkflowFeatureRequirement
   - class: StepInputExpressionRequirement
+  - class: InlineJavascriptRequirement
   - $import: types.cwl
 
 inputs:
@@ -31,9 +32,15 @@ inputs:
     type: File
 
 outputs:
-  narrowpeak_file:
+  pooled_narrowpeak_file:
+    type: File
+    outputSource: pooled_call_peaks/narrowpeak_file
+  replicate_narrowpeak_files:
     type: File[]
-    outputSource: call_peaks/narrowpeak_file
+    outputSource: pooled_call_peaks/narrowpeak_file
+  # idr_peaks:
+  #   type: File
+  #   outputSource: idr/output
 
 steps:
   align_treatment:
@@ -56,7 +63,7 @@ steps:
       blacklist: blacklist
     out: [processed_reads]
     scatter: [ reads ]
-  call_peaks:
+  replicate_call_peaks:
     run: tools/macs-callpeak.cwl
     in:
       treatment: align_treatment/processed_reads
@@ -64,3 +71,28 @@ steps:
     out: [narrowpeak_file]
     scatter: [ treatment, control ]
     scatterMethod: dotproduct
+  pooled_replicates_treatment:
+    run: tools/samtools-merge.cwl
+    in:
+      input: 
+        source: align_treatment/processed_reads
+    out: [ output ]
+  pooled_replicates_control:
+    run: tools/samtools-merge.cwl
+    in:
+      input: 
+        source: align_control/processed_reads
+    out: [ output ]
+  pooled_call_peaks:
+    run: tools/macs-callpeak.cwl
+    in:
+      treatment: pooled_replicates_treatment/output
+      control: pooled_replicates_control/output
+    out: [narrowpeak_file]
+  # idr:
+  #   run: tools/idr.cwl
+  #   in:
+  #       samples: replicate_call_peaks/narrowpeak_file
+  #       peak-list: pooled_call_peaks/narrowpeak_file
+  #   out:
+  #       [output]
