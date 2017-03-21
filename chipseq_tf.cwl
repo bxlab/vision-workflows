@@ -37,7 +37,7 @@ outputs:
     outputSource: pooled_call_peaks/narrowpeak_file
   replicate_narrowpeak_files:
     type: File[]
-    outputSource: pooled_call_peaks/narrowpeak_file
+    outputSource: replicate_call_peaks/narrowpeak_file
   # idr_peaks:
   #   type: File
   #   outputSource: idr/output
