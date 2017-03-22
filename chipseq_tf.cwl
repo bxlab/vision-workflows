@@ -33,17 +33,20 @@ inputs:
 
 outputs:
   pooled_narrowpeak_file:
+    doc: Peaks for each replicate
     type: File
-    outputSource: pooled_call_peaks/narrowpeak_file
+    outputSource: name_outputs/pooled_narrowpeak_file
   replicate_narrowpeak_files:
+    doc: Peaks from pooling replicates
     type: File[]
-    outputSource: replicate_call_peaks/narrowpeak_file
+    outputSource: name_outputs/replicate_narrowpeak_files
   # idr_peaks:
   #   type: File
   #   outputSource: idr/output
 
 steps:
   align_treatment:
+    doc: Align treatment reads for all replictes
     run: chipseq_tf_align.cwl
     in:
       reads: 
@@ -54,6 +57,7 @@ steps:
     out: [processed_reads]
     scatter: [ reads ]
   align_control:
+    doc: Align control reads for all replicates
     run: chipseq_tf_align.cwl
     in:
       reads: 
@@ -64,6 +68,7 @@ steps:
     out: [processed_reads]
     scatter: [ reads ]
   replicate_call_peaks:
+    doc: Call peaks for replicates independently
     run: tools/macs-callpeak.cwl
     in:
       treatment: align_treatment/processed_reads
@@ -72,27 +77,54 @@ steps:
     scatter: [ treatment, control ]
     scatterMethod: dotproduct
   pooled_replicates_treatment:
+    doc: Pool treatment reads for all replicates
     run: tools/samtools-merge.cwl
     in:
       input: 
         source: align_treatment/processed_reads
     out: [ output ]
   pooled_replicates_control:
+    doc: Pool control reads for all replicates
     run: tools/samtools-merge.cwl
     in:
       input: 
         source: align_control/processed_reads
     out: [ output ]
   pooled_call_peaks:
+    doc: Call peaks on pooled reads
     run: tools/macs-callpeak.cwl
     in:
       treatment: pooled_replicates_treatment/output
       control: pooled_replicates_control/output
     out: [narrowpeak_file]
   # idr:
+  #   doc: Run IDR analysis using pooled peaks as "oracle" peak list
   #   run: tools/idr.cwl
   #   in:
   #       samples: replicate_call_peaks/narrowpeak_file
   #       peak-list: pooled_call_peaks/narrowpeak_file
   #   out:
   #       [output]
+
+  name_outputs:
+    doc: Rename outputs to avoid conflicts
+    in:
+      replicate_narrowpeak_files: replicate_call_peaks/narrowpeak_file
+      pooled_narrowpeak_file: pooled_call_peaks/narrowpeak_file
+    out: [ replicate_narrowpeak_files, pooled_narrowpeak_file ]
+    run:
+      class: ExpressionTool
+      inputs: 
+        replicate_narrowpeak_files: File[]
+        pooled_narrowpeak_file: File
+      outputs:
+        replicate_narrowpeak_files: File[]
+        pooled_narrowpeak_file: File
+      expression: |
+        ${
+        inputs.replicate_narrowpeak_files.forEach( function( e, i ) {
+          e.basename = "Rep_" + i.toString() + ".narrowPeak";
+        });
+        inputs.pooled_narrowpeak_file.basename = "Pooled.narrowPeak";
+        return inputs;
+        }
