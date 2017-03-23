@@ -5,7 +5,7 @@ class: CommandLineTool
 
 hints:
   - class: DockerRequirement
-    dockerPull: 'quay.io/biocontainers/idr'
+    dockerPull: 'quay.io/biocontainers/idr:2.0.3--py35_4'
 
 baseCommand: ["idr"]
 

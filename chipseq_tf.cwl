@@ -40,9 +40,10 @@ outputs:
     doc: Peaks from pooling replicates
     type: File[]
     outputSource: name_outputs/replicate_narrowpeak_files
-  # idr_peaks:
-  #   type: File
-  #   outputSource: idr/output
+  idr_narrowpeak_file:
+    doc: Peaks surviving IDR using pooled peaks as oracle
+    type: File
+    outputSource: name_outputs/idr_narrowpeak_file
 
 steps:
   align_treatment:
@@ -96,35 +97,38 @@ steps:
     in:
       treatment: pooled_replicates_treatment/output
       control: pooled_replicates_control/output
-    out: [narrowpeak_file]
-  # idr:
-  #   doc: Run IDR analysis using pooled peaks as "oracle" peak list
-  #   run: tools/idr.cwl
-  #   in:
-  #       samples: replicate_call_peaks/narrowpeak_file
-  #       peak-list: pooled_call_peaks/narrowpeak_file
-  #   out:
-  #       [output]
-
+    out: [narrowpeak_file, treatment_pileup_bdg]
+  idr:
+    doc: Run IDR analysis using pooled peaks as "oracle" peak list
+    run: tools/idr.cwl
+    in:
+        samples: replicate_call_peaks/narrowpeak_file
+        peak-list: pooled_call_peaks/narrowpeak_file
+    out:
+        [output]
   name_outputs:
     doc: Rename outputs to avoid conflicts
     in:
       replicate_narrowpeak_files: replicate_call_peaks/narrowpeak_file
       pooled_narrowpeak_file: pooled_call_peaks/narrowpeak_file
-    out: [ replicate_narrowpeak_files, pooled_narrowpeak_file ]
+      idr_narrowpeak_file: idr/output
+    out: [ replicate_narrowpeak_files, pooled_narrowpeak_file, idr_narrowpeak_file ]
     run:
       class: ExpressionTool
       inputs: 
         replicate_narrowpeak_files: File[]
         pooled_narrowpeak_file: File
+        idr_narrowpeak_file: File
       outputs:
         replicate_narrowpeak_files: File[]
         pooled_narrowpeak_file: File
+        idr_narrowpeak_file: File
       expression: |
         ${
         inputs.replicate_narrowpeak_files.forEach( function( e, i ) {
           e.basename = "Rep_" + i.toString() + ".narrowPeak";
         });
         inputs.pooled_narrowpeak_file.basename = "Pooled.narrowPeak";
+        inputs.idr_narrowpeak_file.basename = "Pooled_IDR.narrowPeak";
         return inputs;
         }

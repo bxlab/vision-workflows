@@ -9,7 +9,7 @@ hints:
   - class: ResourceRequirement
     coresMax: 112
 
-baseCommand: [ macs2, callpeak, --outdir, outdir ]
+baseCommand: [ macs2, callpeak, -B, --outdir, outdir ]
 
 inputs:
   treatment:
@@ -31,3 +31,11 @@ outputs:
     type: File
     outputBinding:
       glob: "outdir/*_peaks.narrowPeak"
+  treatment_pileup_bdg:
+    type: File
+    outputBinding:
+      glob: "outdir/*_treat_pileup.bdg"
+  control_lambda_bdg:
+    type: File
+    outputBinding:
+      glob: "outdir/*_control_lambda.bdg"
