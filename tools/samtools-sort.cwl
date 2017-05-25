@@ -12,6 +12,8 @@ baseCommand: ["samtools", "sort"]
 arguments:
 - prefix: "--threads"
   valueFrom: $(runtime.cores)
+- prefix: "-T"
+  valueFrom: $TMPDIR
 
 inputs:
   input:
