@@ -4,8 +4,12 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: 'quay.io/biocontainers/samtools'
+  SoftwareRequirement:
+    packages:
+    - package: samtools
+      version: [ "1.5" ]
 
 baseCommand: ["samtools", "sort"]
 

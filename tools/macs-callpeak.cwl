@@ -4,9 +4,13 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: quay.io/biocontainers/macs2:2.1.1.20160309--r3.2.2_0
-  - class: ResourceRequirement
+  SoftwareRequirement:
+    packages:
+    - package: macs2
+      version: [ 2.1.1.20160309 ]
+  ResourceRequirement:
     coresMax: 112
 
 baseCommand: [ macs2, callpeak, -B, --outdir, outdir ]

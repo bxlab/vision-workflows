@@ -4,8 +4,12 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: quay.io/biocontainers/picard:2.7.1--py27_0
+  SoftwareRequirement:
+    packages:
+    - package: picard
+      version: [ 2.9.2 ]
 
 baseCommand: [ picard, MarkDuplicates, OUTPUT=output.bam, METRICS_FILE=metrics.txt ]
 

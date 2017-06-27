@@ -4,9 +4,13 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: quay.io/biocontainers/bwa:0.7.15--0
-  - class: ResourceRequirement
+  SoftwareRequirement:
+    packages:
+    - package: bwa
+      version: [ 0.7.15 ]
+  ResourceRequirement:
     coresMax: 112
 
 baseCommand: [ bwa, mem ]

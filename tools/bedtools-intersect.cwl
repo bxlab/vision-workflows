@@ -4,8 +4,12 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: 'quay.io/biocontainers/bedtools:2.26.0gx--0'
+  SoftwareRequirement:
+    packages:
+    - package: bedtools
+      version: [ 2.26.0gx ]
 
 baseCommand: ["bedtools", "intersect"]
 

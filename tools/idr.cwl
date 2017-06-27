@@ -4,8 +4,13 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 hints:
-  - class: DockerRequirement
+  DockerRequirement:
     dockerPull: 'quay.io/biocontainers/idr:2.0.3--py35_4'
+  SoftwareRequirement:
+    packages:
+    - package: idr 
+      version: [ 2.0.3 ]
+
 
 baseCommand: ["idr"]
 
