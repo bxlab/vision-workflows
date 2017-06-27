@@ -18,6 +18,7 @@ inputs:
     type: File
     inputBinding:
       prefix: INPUT=
+      separate: false
   remove_duplicates:
     type: boolean
     default: true

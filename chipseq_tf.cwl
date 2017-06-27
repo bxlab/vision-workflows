@@ -126,9 +126,9 @@ steps:
       expression: |
         ${
         var outputs = { 
-            out_replicate_narrowpeak_files = inputs.replicate_narrowpeak_files,
-            out_pooled_narrowpeak_file = inputs.pooled_narrowpeak_file,
-            out_idr_narrowpeak_file = inputs.idr_narrowpeak_file
+            out_replicate_narrowpeak_files: inputs.replicate_narrowpeak_files,
+            out_pooled_narrowpeak_file: inputs.pooled_narrowpeak_file,
+            out_idr_narrowpeak_file: inputs.idr_narrowpeak_file
         }
         outputs.out_replicate_narrowpeak_files.forEach( function( e, i ) {
           e.basename = "Rep_" + i.toString() + ".narrowPeak";
